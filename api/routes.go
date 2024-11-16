@@ -15,8 +15,7 @@ func SetupRoutes() {
 
 	router.POST("/users", handlers.HandleAddUsers)
 	router.POST("/posts", handlers.HandleAddPosts)
-	
-
+	router.GET("/posts", handlers.HandleFetchPosts)
 
 	router.Run()
 }

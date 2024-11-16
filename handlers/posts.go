@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 
 	"blog-backend/app"
 	"blog-backend/models"
@@ -46,3 +47,53 @@ import (
 
 		context.JSON(201, post)
 	}
+
+	func HandleFetchPosts(context *gin.Context) {
+		rows, err := app.Db.Query("SELECT * FROM posts")
+	
+		if err != nil {
+	
+			log.Fatal(err)
+	
+			context.JSON(500, gin.H{
+				"message": "Something went wrong",
+			})
+		}
+	
+		defer rows.Close()
+	
+		var posts []models.Post
+	
+		for rows.Next() {
+	
+			var post models.Post
+	
+			if err := rows.Scan(&post.Id, &post.Title, &post.Body, &post.UserId, &post.CreatedAt, &post.UpdatedAt); err != nil {
+	
+				log.Fatal(err)
+	
+				context.JSON(500, gin.H{
+					"message": "Something went wrong",
+				})	
+			}
+	
+			posts = append(posts, post)
+		}
+	
+		if err = rows.Err(); err != nil {
+	
+			log.Fatal(err)
+	
+			context.JSON(500, gin.H{
+				"message": "Something went wrong",
+			})
+		}
+	
+		if (posts == nil) {
+			context.JSON(200, []models.Post{})
+			return
+		}
+	
+		context.JSON(200, posts)
+	}
+	
