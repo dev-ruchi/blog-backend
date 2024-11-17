@@ -17,6 +17,7 @@ func SetupRoutes() {
 	router.POST("/posts", handlers.HandleAddPosts)
 	router.GET("/posts", handlers.HandleFetchPosts)
 	router.PATCH("/posts/:id", handlers.HandleUpdatePosts)
+	router.DELETE("posts/:id", handlers.HandleDeletePosts)
 
 	router.Run()
 }

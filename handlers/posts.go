@@ -148,3 +148,21 @@ func HandleUpdatePosts(context *gin.Context) {
 		"post":    post,
 	})
 }
+
+func HandleDeletePosts(context *gin.Context) {
+
+	query := `
+      DELETE FROM posts WHERE id=$1;`
+
+	_, err := app.Db.Query(query, context.Param("id"))
+
+	if err != nil {
+		fmt.Println(err)
+		context.JSON(500, gin.H{
+			"message": "Something went wrong",
+		})
+		return
+	}
+
+	context.Status(204)
+}
