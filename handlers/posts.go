@@ -23,6 +23,9 @@ func HandleAddPosts(context *gin.Context) {
 		return
 	}
 
+	// Hardcode UserId
+	post.UserId = 1
+
 	query := `
 			INSERT INTO posts (title, body, user_id, created_at, updated_at)
 			VALUES ($1, $2, $3, $4, $5)

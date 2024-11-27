@@ -56,7 +56,7 @@ func createPostsTable() {
 			id SERIAL PRIMARY KEY,
 			title TEXT,
 			body TEXT,
-			user_id INT REFERENCES users(id) ON DELETE CASCADE,
+			user_id INT,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		)
