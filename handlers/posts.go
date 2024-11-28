@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 
 	"blog-backend/app"
 	"blog-backend/models"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -168,4 +170,35 @@ func HandleDeletePosts(context *gin.Context) {
 	}
 
 	context.Status(204)
+}
+
+func HandleFetchPost(context *gin.Context) {
+	// Get the post ID from the URL parameters
+	postID := context.Param("id")
+
+	// Prepare the SQL query
+	query := "SELECT id, title, body, user_id, created_at, updated_at FROM posts WHERE id = $1"
+
+	// Query the database for the post
+	var post models.Post
+
+	err := app.Db.QueryRow(query, postID).Scan(&post.Id, &post.Title, &post.Body, &post.UserId, &post.CreatedAt, &post.UpdatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// If no post is found, return a 404 Not Found response
+			context.JSON(http.StatusNotFound, gin.H{
+				"message": "Post not found",
+			})
+		} else {
+			// Log the error and return a 500 Internal Server Error response
+			log.Println("Error fetching post:", err)
+			context.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Failed to fetch post",
+			})
+		}
+		return
+	}
+
+	// Return the product as JSON
+	context.JSON(http.StatusOK, post)
 }
