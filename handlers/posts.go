@@ -8,6 +8,7 @@ import (
 	"blog-backend/app"
 	"blog-backend/models"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -174,7 +175,16 @@ func HandleDeletePosts(context *gin.Context) {
 
 func HandleFetchPost(context *gin.Context) {
 	// Get the post ID from the URL parameters
-	postID := context.Param("id")
+	postIDStr := context.Param("id")
+
+	// Convert postID to an integer
+	postID, err := strconv.Atoi(postIDStr)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid post ID format",
+		})
+		return
+	}
 
 	// Prepare the SQL query
 	query := "SELECT id, title, body, user_id, created_at, updated_at FROM posts WHERE id = $1"
@@ -182,7 +192,7 @@ func HandleFetchPost(context *gin.Context) {
 	// Query the database for the post
 	var post models.Post
 
-	err := app.Db.QueryRow(query, postID).Scan(&post.Id, &post.Title, &post.Body, &post.UserId, &post.CreatedAt, &post.UpdatedAt)
+	err = app.Db.QueryRow(query, postID).Scan(&post.Id, &post.Title, &post.Body, &post.UserId, &post.CreatedAt, &post.UpdatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// If no post is found, return a 404 Not Found response
